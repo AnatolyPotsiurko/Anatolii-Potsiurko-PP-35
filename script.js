@@ -1,50 +1,27 @@
 "use strict";
+import {
+  normalizeNumberString,
+  compute,
+  formatResult,
+  inputDigit,
+  inputDot,
+  backspace,
+  toggleSign,
+  percent
+} from "./src/calculator.js";
 
 const display = document.getElementById("display");
 const keys = document.querySelector(".keys");
 
 // Стан калькулятора
-let current = "0";   // що зараз на екрані
-let stored = null;   // перше число
-let op = null;       // операція
+let current = "0";
+let stored = null;
+let op = null;
 let justEvaluated = false;
 
 function setDisplay(v) {
   current = v;
   display.value = v;
-}
-
-function normalizeNumberString(s) {
-  // прибрати зайві нулі типу 00012, але зберегти "0." і "-" варіанти
-  if (s === "" || s === "-" || s === "-0") return s;
-  if (s.includes(".")) {
-    // "000.5" -> "0.5"
-    const [a, b] = s.split(".");
-    const na = String(Number(a)); // Number("000") -> 0
-    return `${na}.${b}`;
-  }
-  return String(Number(s));
-}
-
-function inputDigit(d) {
-  if (justEvaluated) {
-    setDisplay(d);
-    justEvaluated = false;
-    return;
-  }
-
-  if (current === "0") setDisplay(d);
-  else if (current === "-0") setDisplay("-" + d);
-  else setDisplay(current + d);
-}
-
-function inputDot() {
-  if (justEvaluated) {
-    setDisplay("0.");
-    justEvaluated = false;
-    return;
-  }
-  if (!current.includes(".")) setDisplay(current + ".");
 }
 
 function clearAll() {
@@ -54,43 +31,33 @@ function clearAll() {
   setDisplay("0");
 }
 
-function backspace() {
+function handleDigit(d) {
+  setDisplay(inputDigit(current, d, justEvaluated));
+  justEvaluated = false;
+}
+
+function handleDot() {
+  setDisplay(inputDot(current, justEvaluated));
+  justEvaluated = false;
+}
+
+function handleBackspace() {
   if (justEvaluated) {
-    // після "=" backspace повертає до 0
     clearAll();
     return;
   }
-  if (current.length <= 1 || (current.length === 2 && current.startsWith("-"))) {
-    setDisplay("0");
-  } else {
-    setDisplay(current.slice(0, -1));
-  }
+  setDisplay(backspace(current, false));
 }
 
-function toggleSign() {
-  if (current === "0") return;
-  if (current.startsWith("-")) setDisplay(current.slice(1));
-  else setDisplay("-" + current);
+function handleToggleSign() {
+  setDisplay(toggleSign(current));
 }
 
-function percent() {
-  const n = Number(current);
-  if (!Number.isFinite(n)) return;
-  setDisplay(String(n / 100));
-}
-
-function compute(a, b, operator) {
-  switch (operator) {
-    case "+": return a + b;
-    case "-": return a - b;
-    case "*": return a * b;
-    case "/": return b === 0 ? NaN : a / b;
-    default: return b;
-  }
+function handlePercent() {
+  setDisplay(percent(current));
 }
 
 function chooseOp(nextOp) {
-  // якщо вже є stored і op, то рахуємо проміжний результат
   const currNum = Number(current);
   if (!Number.isFinite(currNum)) return;
 
@@ -103,7 +70,7 @@ function chooseOp(nextOp) {
   }
 
   op = nextOp;
-  justEvaluated = true; // наступний digit почне нове число
+  justEvaluated = true;
 }
 
 function equals() {
@@ -116,17 +83,9 @@ function equals() {
   const res = compute(a, b, op);
   setDisplay(formatResult(res));
 
-  // скидаємо операцію, але залишаємо результат як stored для можливих наступних "="
   stored = res;
   op = null;
   justEvaluated = true;
-}
-
-function formatResult(x) {
-  if (!Number.isFinite(x)) return "Error";
-  // обрізати дрібні артефакти типу 0.30000000004
-  const rounded = Math.round((x + Number.EPSILON) * 1e12) / 1e12;
-  return String(rounded);
 }
 
 // Кліки по кнопках
@@ -138,14 +97,14 @@ keys.addEventListener("click", (e) => {
   const operator = btn.dataset.op;
   const action = btn.dataset.action;
 
-  if (digit) inputDigit(digit);
+  if (digit) handleDigit(digit);
   else if (operator) chooseOp(operator);
-  else if (action === "dot") inputDot();
+  else if (action === "dot") handleDot();
   else if (action === "equals") equals();
   else if (action === "clear") clearAll();
-  else if (action === "back") backspace();
-  else if (action === "sign") toggleSign();
-  else if (action === "percent") percent();
+  else if (action === "back") handleBackspace();
+  else if (action === "sign") handleToggleSign();
+  else if (action === "percent") handlePercent();
 
   display.focus();
 });
@@ -154,18 +113,22 @@ keys.addEventListener("click", (e) => {
 document.addEventListener("keydown", (e) => {
   const k = e.key;
 
-  if (k >= "0" && k <= "9") inputDigit(k);
-  else if (k === ".") inputDot();
+  if (k >= "0" && k <= "9") handleDigit(k);
+  else if (k === ".") handleDot();
   else if (k === "+" || k === "-" || k === "*" || k === "/") chooseOp(k);
-  else if (k === "Enter" || k === "=") { e.preventDefault(); equals(); }
-  else if (k === "Backspace") backspace();
-  else if (k === "Escape") clearAll();
+  else if (k === "Enter" || k === "=") {
+    e.preventDefault();
+    equals();
+  } else if (k === "Backspace") {
+    handleBackspace();
+  } else if (k === "Escape") {
+    clearAll();
+  }
 });
 
 // Ініціалізація
 display.value = current;
 display.addEventListener("input", () => {
-  // Дозволяємо ручний ввод, але чистимо сміття
   const s = display.value.replace(/[^\d\.\-]/g, "");
   setDisplay(normalizeNumberString(s));
 });
