@@ -129,6 +129,6 @@ document.addEventListener("keydown", (e) => {
 // Ініціалізація
 display.value = current;
 display.addEventListener("input", () => {
-  const s = display.value.replace(/[^\d\.\-]/g, "");
+  const s = display.value.replace(/[^\d]/g, "");
   setDisplay(normalizeNumberString(s));
 });

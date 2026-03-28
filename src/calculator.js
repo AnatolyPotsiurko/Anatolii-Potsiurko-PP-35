@@ -58,3 +58,16 @@ export function percent(current) {
   if (!Number.isFinite(n)) return current;
   return String(n / 100);
 }
+// Додати цей код в розділ, де ти ініціалізуєш калькулятор
+const statusElement = document.createElement('div');
+statusElement.textContent = import.meta.env.VITE_APP_STATUS;  // Виводимо значення змінної оточення
+statusElement.style.position = 'fixed';
+statusElement.style.top = '10px';
+statusElement.style.right = '10px';
+statusElement.style.background = 'rgba(0,0,0,0.7)';
+statusElement.style.color = 'white';
+statusElement.style.padding = '5px';
+statusElement.style.borderRadius = '5px';
+
+// Додаємо елемент до body
+document.body.appendChild(statusElement);
