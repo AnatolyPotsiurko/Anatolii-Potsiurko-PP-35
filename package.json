@@ -29,14 +29,12 @@
   "homepage": "https://github.com/AnatolyPotsiurko/Anatolii-Potsiurko-PP-35#readme",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.58.2",
     "@vitest/coverage-v8": "^4.1.0",
     "eslint": "^10.1.0",
     "globals": "^17.4.0",
     "http-server": "^14.1.1",
     "playwright": "^1.58.2",
     "vitest": "^4.1.0"
-  },
-  "dependencies": {
-    "@playwright/test": "^1.58.2"
   }
 }
