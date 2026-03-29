@@ -38,6 +38,7 @@
     "vitest": "^4.1.0"
   },
   "dependencies": {
+    "rolldown": "^1.0.0-rc.12",
     "vite": "^8.0.3"
   }
 }
