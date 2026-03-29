@@ -1,21 +1,18 @@
 import { test, expect } from '@playwright/test';
 
 test('calculator adds numbers', async ({ page }) => {
-  await page.goto('http://localhost:5173');
+  await page.goto('http://localhost:5173'); // У вашому випадку має бути порт 5173
 
-  // Збільшуємо таймаут для селекторів
-  console.log('Waiting for digit 2');
-  await page.waitForSelector('[data-digit="2"]', { timeout: 60000 });
-  console.log('Clicking on 2');
-  await page.click('[data-digit="2"]', { timeout: 60000 });
+  // Додаємо статусну інформацію
+  await page.evaluate(() => {
+    const statusElement = document.createElement('div');
+    statusElement.textContent = 'Your status';  // Або використовуйте динамічні значення
+    statusElement.style.position = 'fixed';
+    document.body.appendChild(statusElement);
+  });
 
-
-  console.log('Waiting for digit 3');
-  await page.waitForSelector('[data-digit="3"]', { timeout: 60000 });
-  console.log('Clicking on 3');
-  await page.click('[data-digit="3"]', { timeout: 60000 });
-
-
-  // Перевіряємо, чи результат калькуляції правильний
+  // Ваші кроки тесту для калькулятора
+  await page.click('[data-digit="2"]');
+  await page.click('[data-digit="3"]');
   await expect(page.locator('#display')).toHaveValue('23');
 });
