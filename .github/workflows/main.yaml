@@ -1,0 +1,14 @@
+name: CI/CD Pipeline
+
+on:
+  # Тригер для запуску при push в гілки main та develop
+  push:
+    branches:
+      - main
+      - develop
+  
+  # Тригер для запуску при створенні pull request на гілки main або develop
+  pull_request:
+    branches:
+      - main
+      - develop
