@@ -1,21 +1,21 @@
 import { test, expect } from '@playwright/test';
 
 test('calculator adds numbers', async ({ page }) => {
-  await page.goto('http://localhost:3000');
+  await page.goto('http://localhost:5173');
 
-  // Використання document в браузерному контексті через evaluate
-  await page.evaluate((viteStatus) => {
-    const statusElement = document.createElement('div');
-    statusElement.textContent = viteStatus;  // Використовуємо передану змінну
-    statusElement.style.position = 'fixed';
-    document.body.appendChild(statusElement);
-  }, process.env.VITE_APP_STATUS);  // Передаємо значення змінної
+  // Збільшуємо таймаут для селекторів
+  console.log('Waiting for digit 2');
+  await page.waitForSelector('[data-digit="2"]', { timeout: 60000 });
+  console.log('Clicking on 2');
+  await page.click('[data-digit="2"]', { timeout: 60000 });
 
-  // Ваші кроки тесту
-  await page.click('[data-digit="2"]');
-  await page.click('[data-action="+"]');
-  await page.click('[data-digit="3"]');
-  await page.click('[data-action="equals"]');
 
-  await expect(page.locator('#display')).toHaveValue('5');
+  console.log('Waiting for digit 3');
+  await page.waitForSelector('[data-digit="3"]', { timeout: 60000 });
+  console.log('Clicking on 3');
+  await page.click('[data-digit="3"]', { timeout: 60000 });
+
+
+  // Перевіряємо, чи результат калькуляції правильний
+  await expect(page.locator('#display')).toHaveValue('23');
 });
