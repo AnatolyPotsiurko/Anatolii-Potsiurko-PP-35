@@ -1,3 +1,27 @@
+import posthog from 'posthog-js'
+
+posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
+    api_host: import.meta.env.VITE_POSTHOG_HOST,
+    defaults: '2026-01-30'
+})
+// Захоплення помилок
+posthog.capture('exception', {
+  message: error.message,
+  stack: error.stack,
+});
+posthog.capture('task_created', {
+  priority: 'high', // Властивість події
+  category: 'work',
+  is_authenticated: true,
+});
+posthog.capture('task_completed', {
+  time_to_complete_seconds: 120,
+});
+posthog.onFeatureFlags(() => {
+  if (posthog.isFeatureEnabled('show-urgent-filter')) {
+    document.getElementById('urgent-btn').style.display = 'block';
+  }
+});
 "use strict";
 import {
   normalizeNumberString,
