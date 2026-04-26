@@ -5,7 +5,7 @@
   "main": "script.js",
   "scripts": {
     "start": "http-server . -p 5173",
-    "test:unit": "vitest run",
+    "test:unit": "vitest run tests",
     "test:unit:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test": "npm run test:e2e",
@@ -38,6 +38,8 @@
     "vitest": "^4.1.0"
   },
   "dependencies": {
+    "@sentry/browser": "^10.50.0",
+    "@sentry/vue": "^10.50.0",
     "posthog-js": "^1.369.3",
     "rolldown": "^1.0.0-rc.12",
     "vite": "^8.0.3"

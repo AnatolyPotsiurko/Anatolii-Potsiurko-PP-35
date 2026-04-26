@@ -19,7 +19,7 @@
         <button class="key key--muted" data-action="back">⌫</button>
         <button class="key key--muted" data-action="percent">%</button>
         <button class="key key--op" data-op="/">÷</button>
-
+   
         <button class="key" data-digit="7">7</button>
         <button class="key" data-digit="8">8</button>
         <button class="key" data-digit="9">9</button>
@@ -38,11 +38,21 @@
         <button class="key key--wide" data-action="sign">±</button>
         <button class="key" data-action="dot">.</button>
         <button class="key key--equals" data-action="equals">=</button>
+
+        <!-- Кнопка для виклику помилки -->
+        <button class="key" @click="throwError">Викликати помилку</button>
       </div>
 
       <p class="hint">Клікни або вводь з клавіатури: 0-9, + - * /, Enter, Backspace, Esc.</p>
     </section>
   </main>
+
+  <script type="module">
+    // Функція для виклику помилки
+    function throwError() {
+      throw new Error("Sentry Test Error: Something went wrong!");
+    }
+  </script>
 
   <script type="module" src="script.js"></script>
 </body>

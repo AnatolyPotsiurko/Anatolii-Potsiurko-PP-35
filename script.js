@@ -1,28 +1,3 @@
-import posthog from 'posthog-js'
-
-posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
-    api_host: import.meta.env.VITE_POSTHOG_HOST,
-    defaults: '2026-01-30'
-})
-// Захоплення помилок
-posthog.capture('exception', {
-  message: error.message,
-  stack: error.stack,
-});
-posthog.capture('task_created', {
-  priority: 'high', // Властивість події
-  category: 'work',
-  is_authenticated: true,
-});
-posthog.capture('task_completed', {
-  time_to_complete_seconds: 120,
-});
-posthog.onFeatureFlags(() => {
-  if (posthog.isFeatureEnabled('show-urgent-filter')) {
-    document.getElementById('urgent-btn').style.display = 'block';
-  }
-});
-"use strict";
 import {
   normalizeNumberString,
   compute,
@@ -33,11 +8,41 @@ import {
   toggleSign,
   percent
 } from "./src/calculator.js";
+import posthog from "posthog-js";
+import * as Sentry from "@sentry/browser";
+
+
+const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
+
+
+if (sentryDsn) {
+ Sentry.init({
+   dsn: "https://1b3f59d808bae9bac89ff9cdd655717b@o4511287438934016.ingest.de.sentry.io/4511287441162320",
+   integrations: [
+     Sentry.browserTracingIntegration(),
+   ],
+   tracesSampleRate: 1.0,
+   environment: "development",
+ });
+} else {
+ console.warn("Sentry DSN is missing");
+}
+
+
+export default Sentry;
+
+"use strict";
+
+if (import.meta.env.VITE_POSTHOG_KEY) {
+  posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
+    api_host: import.meta.env.VITE_POSTHOG_HOST,
+    defaults: "2026-01-30"
+  });
+}
 
 const display = document.getElementById("display");
 const keys = document.querySelector(".keys");
 
-// Стан калькулятора
 let current = "0";
 let stored = null;
 let op = null;
@@ -112,7 +117,6 @@ function equals() {
   justEvaluated = true;
 }
 
-// Кліки по кнопках
 keys.addEventListener("click", (e) => {
   const btn = e.target.closest("button");
   if (!btn) return;
@@ -133,7 +137,6 @@ keys.addEventListener("click", (e) => {
   display.focus();
 });
 
-// Ввід з клавіатури
 document.addEventListener("keydown", (e) => {
   const k = e.key;
 
@@ -150,9 +153,8 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-// Ініціалізація
 display.value = current;
 display.addEventListener("input", () => {
-  const s = display.value.replace(/[^\d]/g, "");
+  const s = display.value.replace(/[^\d.-]/g, "");
   setDisplay(normalizeNumberString(s));
 });
